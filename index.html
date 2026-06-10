@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a1a1a" id="meta-theme">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Plates">
+<title>Ironmaster Plate Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ════ THEMES ════
+   Each theme defines the full variable set, including plate/handle/screw
+   colors, so components below never need per-theme selectors. */
+:root {
+  --bg:#1a1a1a; --card:#2c2c2c; --border:#333; --text:#d4d4d4;
+  --subtext:#888; --faint:#555; --fainter:#444; --input-bg:#1a1a1a;
+  --accent:#c0392b; --hi:#e8e0d0; --groove:#111; --rowline:#2a2a2a;
+  --grid:rgba(255,255,255,0.015); --shadow:rgba(0,0,0,0.6);
+  --metal1:#555; --metal2:#333; --metal-bd:#555; --metal-tx:#888;
+  --p5-1:#444; --p5-2:#2a2a2a; --p5-bd:#555; --p5-tx:rgba(255,255,255,0.85);
+  --p2-1:#3a3a3a; --p2-2:#222; --p2-bd:#484848; --p2-tx:rgba(255,255,255,0.85);
+  --plate-bw:1px; --plate-glow:none; --screw-glow:none;
+}
+[data-theme="light"] {
+  --bg:#f0eeea; --card:#fff; --border:#d8d4cc; --text:#2a2a2a;
+  --subtext:#777; --faint:#aaa; --fainter:#ccc; --input-bg:#f5f3f0;
+  --accent:#b83228; --hi:#1a1a1a; --groove:#ccc; --rowline:#ece8e2;
+  --grid:rgba(0,0,0,0.04); --shadow:rgba(0,0,0,0.12);
+  --metal1:#bbb; --metal2:#999; --metal-bd:#aaa; --metal-tx:#666;
+  --p5-1:#777; --p5-2:#555; --p5-bd:#888;
+  --p2-1:#999; --p2-2:#777; --p2-bd:#aaa;
+}
+[data-theme="tacobell"] {
+  --bg:#1a0a3a; --card:#250d50; --border:#4a1a7a; --text:#e0f8f4;
+  --subtext:#7de8d8; --faint:#5ab8a8; --fainter:#3a8878; --input-bg:#120726;
+  --accent:#cc44cc; --hi:#40e8d0; --groove:#0a0418; --rowline:#3a1060;
+  --grid:rgba(64,232,208,0.04); --shadow:rgba(0,0,0,0.7);
+  --metal1:#5a3a8a; --metal2:#3a1a60; --metal-bd:#7a4aaa; --metal-tx:#a080d0;
+  --p5-1:#40d8c8; --p5-2:#1aa898; --p5-bd:#60e8d8; --p5-tx:#003830;
+  --p2-1:#bb44bb; --p2-2:#882288; --p2-bd:#dd66dd; --p2-tx:#fff;
+}
+[data-theme="mcm"] {
+  --bg:#c8b98a; --card:#e8dcc0; --border:#a89060; --text:#2c1f0e;
+  --subtext:#6b4f2a; --faint:#9a7a50; --fainter:#b8a070; --input-bg:#bfaa80;
+  --accent:#c45c1a; --hi:#1a0e05; --groove:#e8dcc0; --rowline:#c0a870;
+  --grid:rgba(44,31,14,0.06); --shadow:rgba(60,35,10,0.25);
+  --metal1:#7a5530; --metal2:#4e3318; --metal-bd:#9a7040; --metal-tx:#c8a060;
+  --p5-1:#6b7a30; --p5-2:#4a5520; --p5-bd:#8a9a40; --p5-tx:#d8e8a0;
+  --p2-1:#c8881a; --p2-2:#a06010; --p2-bd:#e0a030; --p2-tx:#fff8e0;
+}
+[data-theme="comic"] {
+  --bg:#1a2a6e; --card:#f5f0e0; --border:#d42b2b; --text:#0d0d0d;
+  --subtext:#8b1a1a; --faint:#b04020; --fainter:#d4a020; --input-bg:#e8e0c8;
+  --accent:#d42b2b; --hi:#0d0d0d; --groove:#f5d020; --rowline:#d4c090;
+  --grid:rgba(0,0,0,0); --shadow:rgba(0,0,0,0.5);
+  --metal1:#555; --metal2:#333; --metal-bd:#0d0d0d; --metal-tx:#ccc;
+  --p5-1:#e03030; --p5-2:#b01010; --p5-bd:#0d0d0d; --p5-tx:#fff;
+  --p2-1:#f5d020; --p2-2:#d4a800; --p2-bd:#0d0d0d; --p2-tx:#0d0d0d;
+  --plate-bw:2px;
+}
+[data-theme="laser"] {
+  --bg:#0d0020; --card:#160030; --border:#cc00cc; --text:#f0e0ff;
+  --subtext:#cc44ff; --faint:#883399; --fainter:#551166; --input-bg:#0a0018;
+  --accent:#ff2090; --hi:#00f0ff; --groove:#ff2090; --rowline:#330055;
+  --grid:rgba(0,0,0,0); --shadow:rgba(0,0,0,0.8);
+  --metal1:#2a0a50; --metal2:#180630; --metal-bd:#cc00cc; --metal-tx:#cc44ff;
+  --p5-1:#ee1090; --p5-2:#aa0060; --p5-bd:#ff40b0; --p5-tx:#fff;
+  --p2-1:#00d8ee; --p2-2:#0099bb; --p2-bd:#40f0ff; --p2-tx:#003344;
+  --plate-glow:0 0 8px #ff209088; --screw-glow:0 0 6px #cc00cc88;
+}
+[data-theme="batman"] {
+  --bg:#0a0a0a; --card:#111; --border:#333300; --text:#e8e0c0;
+  --subtext:#888860; --faint:#555540; --fainter:#2a2a20; --input-bg:#080808;
+  --accent:#f0c000; --hi:#f5d020; --groove:#000; --rowline:#1a1a10;
+  --grid:rgba(0,0,0,0); --shadow:rgba(0,0,0,0.95);
+  --metal1:#222; --metal2:#0a0a0a; --metal-bd:#f0c00066; --metal-tx:#f0c000aa;
+  --p5-1:#1a1a1a; --p5-2:#080808; --p5-bd:#f0c000; --p5-tx:#f0c000;
+  --p2-1:#f0c000; --p2-2:#c89800; --p2-bd:#ffd700; --p2-tx:#000;
+}
+[data-theme="goth"] {
+  --bg:#0c080f; --card:#130a18; --border:#3a1a3a; --text:#d0c0d8;
+  --subtext:#7a5a80; --faint:#4a2a50; --fainter:#2a1030; --input-bg:#08050c;
+  --accent:#8b0000; --hi:#c8a0d0; --groove:#000; --rowline:#1e0e24;
+  --grid:rgba(0,0,0,0); --shadow:rgba(0,0,0,0.95);
+  --metal1:#1e0e28; --metal2:#100818; --metal-bd:#4a1a4a; --metal-tx:#7a4a7a;
+  --p5-1:#5a0000; --p5-2:#300000; --p5-bd:#8b0000; --p5-tx:#ffaaaa;
+  --p2-1:#3a3040; --p2-2:#201828; --p2-bd:#6a5070; --p2-tx:#c8a0d0;
+}
+
+/* ════ BASE ════ */
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: calc(1.75rem + env(safe-area-inset-top)) 1rem calc(2.5rem + env(safe-area-inset-bottom));
+  transition: background-color 0.3s, color 0.3s;
+  background-image:
+    repeating-linear-gradient(90deg, transparent, transparent 40px, var(--grid) 40px, var(--grid) 41px),
+    repeating-linear-gradient(0deg,  transparent, transparent 40px, var(--grid) 40px, var(--grid) 41px);
+}
+button {
+  font: inherit; cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none; -webkit-user-select: none;
+}
+
+/* theme-specific atmosphere */
+[data-theme="comic"] body {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.18) 1.5px, transparent 1.5px);
+  background-size: 14px 14px;
+}
+[data-theme="laser"] body {
+  background-image:
+    linear-gradient(rgba(255,0,200,0.55) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,0,200,0.35) 1px, transparent 1px),
+    linear-gradient(rgba(0,200,255,0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,200,255,0.15) 1px, transparent 1px),
+    radial-gradient(ellipse 120% 60% at 50% 110%, #cc00aa 0%, transparent 60%),
+    radial-gradient(ellipse 100% 50% at 50% 120%, #0066ff 0%, transparent 55%);
+  background-size: 100% 40px, 40px 100%, 100% 8px, 8px 100%, 100% 100%, 100% 100%;
+  background-attachment: local;
+}
+[data-theme="batman"] body {
+  background-image:
+    radial-gradient(ellipse 40% 30% at 50% 0%, rgba(240,192,0,0.07) 0%, transparent 70%),
+    repeating-linear-gradient(180deg, transparent, transparent 3px, rgba(255,255,255,0.012) 3px, rgba(255,255,255,0.012) 4px);
+  background-size: 100% 100%, 100% 4px;
+}
+[data-theme="goth"] body {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 100%, rgba(80,0,60,0.6) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(139,0,0,0.2) 0%, transparent 60%),
+    repeating-linear-gradient(135deg, transparent, transparent 30px, rgba(100,0,80,0.03) 30px, rgba(100,0,80,0.03) 31px);
+  background-size: 100% 100%, 100% 100%, 60px 60px;
+}
+
+/* ════ HEADER ════ */
+header { text-align: center; margin-bottom: 1.25rem; }
+header h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.8rem, 11vw, 5.5rem);
+  letter-spacing: 0.05em; color: var(--hi); line-height: 0.9;
+  text-shadow: 4px 4px 0 var(--groove);
+  transition: color 0.3s;
+}
+header h1 span { color: var(--accent); }
+header p {
+  font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--subtext); margin-top: 0.6rem;
+}
+[data-theme="comic"] header h1 {
+  color: #f5f0e0;
+  text-shadow: 3px 3px 0 #0d0d0d, -1px -1px 0 #0d0d0d, 1px -1px 0 #0d0d0d, -1px 1px 0 #0d0d0d;
+}
+[data-theme="comic"] header h1 span { color: #f5d020; }
+[data-theme="laser"] header h1 {
+  color: #00f0ff;
+  text-shadow: 0 0 10px #00f0ff, 0 0 30px #00aaff, 0 0 60px #0066ff, 3px 3px 0 #ff2090;
+}
+[data-theme="laser"] header h1 span {
+  color: #ff2090;
+  text-shadow: 0 0 10px #ff2090, 0 0 30px #ff0066, 0 0 60px #cc0044;
+}
+[data-theme="batman"] header h1 {
+  color: #f5d020;
+  text-shadow: 0 0 8px rgba(240,192,0,0.4), 0 0 2px #000, 2px 2px 0 #000;
+}
+[data-theme="batman"] header h1 span { color: #111; -webkit-text-stroke: 2px #f5d020; }
+[data-theme="goth"] header h1 {
+  color: #c8a0d0;
+  text-shadow: 0 0 12px rgba(180,80,180,0.3), 2px 2px 0 #000;
+}
+[data-theme="goth"] header h1 span {
+  color: #8b0000;
+  text-shadow: 0 0 10px rgba(139,0,0,0.5), 2px 2px 0 #000;
+}
+
+/* ════ THEME SWITCHER ════ */
+.theme-switcher {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  background: var(--input-bg);
+  border: 1px solid var(--border); border-radius: 4px;
+  overflow: hidden; margin-bottom: 1.75rem; max-width: 480px;
+}
+.theme-btn {
+  background: none; border: none;
+  padding: 0.55rem 0.85rem; min-height: 42px;
+  font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--subtext);
+  transition: background 0.15s, color 0.15s;
+}
+.theme-btn.active { background: var(--accent); color: #fff; }
+
+/* ════ CARD ════ */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 1.5rem; width: 100%; max-width: 480px;
+  box-shadow: 0 20px 60px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.05);
+  transition: background 0.3s, border-color 0.3s;
+}
+@media (min-width: 420px) { .card { padding: 2rem; } }
+[data-theme="tacobell"] .card {
+  box-shadow: 0 20px 60px var(--shadow), 0 0 40px rgba(100,0,160,0.3), inset 0 1px 0 rgba(64,232,208,0.1);
+}
+[data-theme="mcm"] .card {
+  box-shadow: 0 20px 60px var(--shadow), inset 0 1px 0 rgba(255,245,220,0.6);
+  border-top: 3px solid #c45c1a;
+}
+[data-theme="comic"] .card {
+  border: 3px solid #0d0d0d; border-radius: 2px;
+  box-shadow: 6px 6px 0 #f5d020, 0 20px 60px var(--shadow);
+}
+[data-theme="laser"] .card {
+  box-shadow: 0 0 0 1px #ff00ff44, 0 0 20px #cc00cc88, 0 0 60px #8800aa44, inset 0 0 30px rgba(100,0,150,0.15);
+}
+[data-theme="batman"] .card {
+  border-color: #2a2a18;
+  box-shadow: 0 0 0 1px #f0c00011, 0 30px 80px rgba(0,0,0,0.98), inset 0 1px 0 rgba(240,192,0,0.06);
+}
+[data-theme="goth"] .card {
+  box-shadow: 0 0 0 1px #8b000022, inset 0 0 40px rgba(60,0,40,0.4), 0 30px 80px rgba(0,0,0,0.98);
+  background: linear-gradient(160deg, #170c1e 0%, #0e0612 100%);
+}
+
+.section-label {
+  font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--subtext); margin-bottom: 0.65rem;
+}
+
+/* ════ CONFIG BUTTONS ════ */
+.config-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;
+  margin-bottom: 1.75rem;
+}
+.config-btn {
+  background: var(--input-bg); border: 1px solid var(--border); border-radius: 3px;
+  color: var(--subtext);
+  font-family: 'Bebas Neue', sans-serif; font-size: 1.05rem; letter-spacing: 0.04em;
+  padding: 0.6rem 0.2rem 0.5rem; min-height: 54px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  line-height: 1;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.config-btn span {
+  font-family: 'DM Mono', monospace; font-size: 0.5rem;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint);
+}
+.config-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.config-btn.active span { color: rgba(255,255,255,0.8); }
+
+/* ════ WEIGHT CONTROL ════ */
+.weight-control {
+  display: flex; align-items: center;
+  background: var(--input-bg); border: 1px solid var(--fainter); border-radius: 3px;
+  overflow: hidden; margin-bottom: 0.4rem;
+  transition: background 0.3s, border-color 0.3s;
+}
+.weight-control button {
+  background: none; border: none; color: var(--text);
+  font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
+  width: 68px; height: 68px; flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.weight-control button:active { background: rgba(128,0,128,0.2); color: var(--accent); }
+#weight-display {
+  flex: 1; text-align: center;
+  font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem;
+  color: var(--hi); letter-spacing: 0.05em; line-height: 1;
+  user-select: none; -webkit-user-select: none;
+}
+.unit { font-size: 0.9rem; color: var(--faint); margin-left: 2px; }
+.step-hint {
+  font-size: 0.58rem; color: var(--faint); letter-spacing: 0.15em;
+  text-align: center; margin-bottom: 1.5rem;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--fainter), transparent);
+  margin: 1.25rem 0;
+}
+
+/* ════ RESULTS ════ */
+.result-section { min-height: 160px; }
+.error-msg { color: var(--accent); font-size: 0.8rem; line-height: 1.6; }
+.setup-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 0.42rem 0; border-bottom: 1px solid var(--rowline); font-size: 0.78rem;
+}
+.setup-row:last-of-type { border-bottom: none; }
+.setup-row .desc { color: var(--subtext); }
+.setup-row .val { font-family: 'Bebas Neue', sans-serif; font-size: 1.05rem; letter-spacing: 0.05em; }
+.val.hi { color: var(--hi); }
+.val.accent { color: var(--accent); }
+.val.muted { color: var(--faint); }
+
+/* asymmetric layout */
+.asym-note {
+  font-size: 0.62rem; color: var(--subtext); letter-spacing: 0.1em; text-align: center;
+  margin-bottom: 0.9rem; padding: 0.35rem 0.6rem;
+  border: 1px solid var(--rowline); border-radius: 2px; background: rgba(128,0,128,0.06);
+}
+.side-cols { display: flex; align-items: stretch; }
+.side-col { flex: 1; padding: 0 0.2rem; min-width: 0; }
+.side-divider {
+  width: 1px; flex-shrink: 0; margin: 0 0.7rem;
+  background: linear-gradient(180deg, transparent, var(--fainter), transparent);
+}
+.side-label {
+  font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--faint); margin-bottom: 0.5rem; text-align: center;
+}
+.side-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 0.3rem 0; border-bottom: 1px solid var(--rowline); font-size: 0.7rem;
+}
+.side-desc { color: var(--subtext); }
+.side-val { font-family: 'Bebas Neue', sans-serif; font-size: 0.95rem; letter-spacing: 0.04em; }
+.side-total {
+  font-family: 'Bebas Neue', sans-serif; font-size: 1rem;
+  color: var(--faint); text-align: center; margin-top: 0.4rem;
+}
+
+/* ════ PLATE VISUAL ════ */
+.plate-visual {
+  display: flex; align-items: center; justify-content: center;
+  gap: 3px; margin-top: 1.1rem; flex-wrap: wrap;
+}
+.handle {
+  background: linear-gradient(180deg, var(--metal1), var(--metal2), var(--metal1));
+  border: var(--plate-bw) solid var(--metal-bd); border-radius: 2px;
+  height: 24px; width: 36px;
+  font-size: 0.45rem; color: var(--metal-tx); letter-spacing: 0.1em;
+  display: flex; align-items: center; justify-content: center;
+}
+.screw {
+  background: linear-gradient(180deg, var(--metal1), var(--metal2), var(--metal1));
+  border: var(--plate-bw) solid var(--metal-bd); border-radius: 1px;
+  width: 10px; height: 28px;
+  box-shadow: var(--screw-glow);
+}
+[data-theme="comic"] .screw { background: linear-gradient(180deg,#2a4aaa,#1a2a7a,#2a4aaa); }
+.plate {
+  border-radius: 2px; display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em;
+  animation: plateIn 0.2s ease both;
+  box-shadow: var(--plate-glow);
+}
+.plate-5 {
+  background: linear-gradient(180deg, var(--p5-1), var(--p5-2), var(--p5-1));
+  border: var(--plate-bw) solid var(--p5-bd); color: var(--p5-tx);
+  width: 28px; height: 40px; font-size: 0.7rem;
+}
+.plate-2 {
+  background: linear-gradient(180deg, var(--p2-1), var(--p2-2), var(--p2-1));
+  border: var(--plate-bw) solid var(--p2-bd); color: var(--p2-tx);
+  width: 22px; height: 32px; font-size: 0.6rem;
+}
+@keyframes plateIn { from { opacity:0; transform:scaleY(0.5) } to { opacity:1; transform:scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { .plate { animation: none; } }
+
+.total-weight {
+  margin-top: 1.1rem; text-align: center;
+  font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem;
+  color: var(--faint); letter-spacing: 0.1em;
+}
+.total-weight span { color: var(--hi); }
+
+/* ════ QUICK PICKS ════ */
+.quickpick-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.qp-btn {
+  background: var(--input-bg); border: 1px solid var(--border); border-radius: 3px;
+  color: var(--subtext); font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.05rem; letter-spacing: 0.06em;
+  min-height: 44px; min-width: 52px; padding: 0.35rem 0.6rem;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.qp-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.qp-btn.unreachable { opacity: 0.28; cursor: default; }
+
+/* hover only on devices that actually hover — prevents sticky hover on touch */
+@media (hover: hover) {
+  .theme-btn:hover { color: var(--hi); }
+  .config-btn:hover { border-color: var(--accent); color: var(--hi); }
+  .weight-control button:hover { background: rgba(128,0,128,0.1); color: var(--accent); }
+  .qp-btn:hover { border-color: var(--accent); color: var(--hi); }
+  .qp-btn.unreachable:hover { border-color: var(--border); color: var(--subtext); }
+}
+
+footer {
+  margin-top: 2rem; font-size: 0.58rem; letter-spacing: 0.18em;
+  color: var(--faint); text-transform: uppercase; text-align: center;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>IRON<span>MASTER</span><br>PLATES</h1>
+  <p>Adjustable Dumbbell Calculator</p>
+</header>
+
+<div class="theme-switcher" id="theme-switcher"></div>
+
+<div class="card">
+  <div class="section-label">Handle Configuration</div>
+  <div class="config-grid" id="config-grid"></div>
+
+  <div class="section-label">Target Weight Per Dumbbell</div>
+  <div class="weight-control">
+    <button id="btn-minus" aria-label="Decrease weight">−</button>
+    <div id="weight-display"></div>
+    <button id="btn-plus" aria-label="Increase weight">+</button>
+  </div>
+  <div class="step-hint">Adjusts in 2.5 lb increments</div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">Per Side Setup</div>
+  <div class="result-section"><div id="result"></div></div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">Quick Pick</div>
+  <div class="quickpick-grid" id="qp-grid"></div>
+</div>
+
+<footer id="footer-note"></footer>
+
+<script>
+'use strict';
+
+/* ════ INTEGER PLATE MATH ════
+   All weights are stored as whole STEPS of 2.5 lb. No floating point
+   exists anywhere in the math, so rounding drift is impossible.
+   1 step = 2.5 lb · handle = 2 steps (5 lb) or 8 steps (heavy, 20 lb)
+   screw = 1 step · 5 lb plate = 2 steps · 2.5 lb plate = 1 step      */
+
+const STEP_LB = 2.5;
+const MAX_STEPS = 48;                       // 120 lb cap
+const QUICK_PICKS = [25, 30, 40, 50, 60, 70, 80, 90, 100, 120];
+
+const CONFIGS = [
+  { handleSteps: 2, screws: 2, label: '10 lb', sub: '2 screws'  },
+  { handleSteps: 8, screws: 2, label: '25 lb', sub: 'Heavy hdl' },
+];
+
+const THEMES = [
+  { id: '',         label: '🔩 Dark',  color: '#1a1a1a' },
+  { id: 'light',    label: '☀️ Light', color: '#f0eeea' },
+  { id: 'tacobell', label: "🌮 '94",   color: '#1a0a3a' },
+  { id: 'mcm',      label: '🪵 MCM',   color: '#c8b98a' },
+  { id: 'comic',    label: '💥 POW',   color: '#1a2a6e' },
+  { id: 'laser',    label: '🌈 Laser', color: '#0d0020' },
+  { id: 'batman',   label: '🦇 Bats',  color: '#0a0a0a' },
+  { id: 'goth',     label: '🖤 Goth',  color: '#0c080f' },
+];
+
+// ── state ──
+let cfgIdx = 0;                             // default: handle + 2 screws
+let wtSteps = 18;                           // default: 45 lb
+
+// steps → display string ("45" or "42.5"). Division by 2 of an integer is
+// exact in JS, so this never drifts.
+const lb = steps => String(steps % 2 ? steps * STEP_LB : steps / 2 * 5);
+
+const cfg       = () => CONFIGS[cfgIdx];
+const baseSteps = () => cfg().handleSteps + cfg().screws;
+
+// One side's plate stack from a step count: greedy 5s, then at most one 2.5.
+// Every non-negative step count is representable, so this never fails.
+const side = steps => ({ fives: steps >> 1, halves: steps & 1, steps });
+
+/* Split total plate steps across two sides.
+   Even total → perfect symmetry. Odd total → one side carries one extra
+   2.5 lb plate (the minimum possible imbalance). */
+function calcPlates(targetSteps) {
+  const total = targetSteps - baseSteps();
+  if (total < 0) return null;
+  const right = total >> 1;
+  const left  = total - right;
+  return { left: side(left), right: side(right), symmetric: total % 2 === 0 };
+}
+
+// ── DOM refs ──
+const $ = id => document.getElementById(id);
+const els = {
+  themes: $('theme-switcher'), configs: $('config-grid'),
+  display: $('weight-display'), result: $('result'),
+  qp: $('qp-grid'), footer: $('footer-note'), metaTheme: $('meta-theme'),
+};
+
+// ── actions ──
+function setTheme(i) {
+  document.documentElement.setAttribute('data-theme', THEMES[i].id);
+  els.metaTheme.setAttribute('content', THEMES[i].color);
+  [...els.themes.children].forEach((b, j) => b.classList.toggle('active', j === i));
+}
+
+function setConfig(i) {
+  cfgIdx = i;
+  wtSteps = Math.max(wtSteps, baseSteps());
+  [...els.configs.children].forEach((b, j) => b.classList.toggle('active', j === i));
+  render();
+}
+
+function adjustWeight(delta) {
+  wtSteps = Math.min(MAX_STEPS, Math.max(baseSteps(), wtSteps + delta));
+  render();
+}
+
+// ── render ──
+function render() {
+  els.display.innerHTML = `${lb(wtSteps)}<span class="unit">lb</span>`;
+  renderResult();
+  renderQuickPicks();
+  const { screws } = cfg();
+  els.footer.textContent =
+    `Handle ${lb(cfg().handleSteps)} lb · ${screws} screw${screws > 1 ? 's' : ''} · Plates: 5 lb & 2.5 lb`;
+}
+
+function renderResult() {
+  const calc = calcPlates(wtSteps);
+  if (!calc) {
+    els.result.innerHTML = `<p class="error-msg">⚠ ${lb(wtSteps)} lb is below the bare setup weight.</p>`;
+    return;
+  }
+  const { left, right, symmetric } = calc;
+  els.result.innerHTML =
+    (symmetric ? symHTML(left) : asymHTML(left, right)) +
+    visualHTML(left, right) +
+    `<div class="total-weight">Total: <span>${lb(wtSteps)} lb</span></div>`;
+}
+
+function plateRows(s, cls) {
+  return `
+    <div class="${cls}-row setup-row">
+      <span class="desc">5 lb plates per side ×${s.fives}</span>
+      <span class="val ${s.fives ? 'hi' : 'muted'}">${s.fives ? s.fives * 5 + ' lb' : 'none'}</span>
+    </div>
+    <div class="${cls}-row setup-row">
+      <span class="desc">2.5 lb plates per side ×${s.halves}</span>
+      <span class="val ${s.halves ? 'accent' : 'muted'}">${s.halves ? '2.5 lb' : 'none'}</span>
+    </div>`;
+}
+
+function symHTML(s) {
+  const { screws } = cfg();
+  return `
+    <div class="setup-row">
+      <span class="desc">Handle + ${screws} screw${screws > 1 ? 's' : ''}</span>
+      <span class="val muted">${lb(baseSteps())} lb</span>
+    </div>` + plateRows(s, 'setup');
+}
+
+function asymHTML(left, right) {
+  const { screws } = cfg();
+  const col = (s, label) => `
+    <div class="side-col">
+      <div class="side-label">${label}</div>
+      <div class="side-row">
+        <span class="side-desc">Screws (${screws}×)</span>
+        <span class="side-val muted">${lb(screws)} lb</span>
+      </div>
+      <div class="side-row">
+        <span class="side-desc">5 lb ×${s.fives}</span>
+        <span class="side-val ${s.fives ? 'hi' : 'muted'}">${s.fives ? s.fives * 5 + ' lb' : 'none'}</span>
+      </div>
+      <div class="side-row">
+        <span class="side-desc">2.5 lb ×${s.halves}</span>
+        <span class="side-val ${s.halves ? 'accent' : 'muted'}">${s.halves ? '2.5 lb' : 'none'}</span>
+      </div>
+      <div class="side-total">${lb(s.steps + screws)} lb</div>
+    </div>`;
+  return `
+    <div class="asym-note">⚠ Can't split evenly — one side gets an extra 2.5 lb plate</div>
+    <div class="side-cols">
+      ${col(left, 'Left Side')}
+      <div class="side-divider"></div>
+      ${col(right, 'Right Side')}
+    </div>`;
+}
+
+function plateDivs(s, reverse) {
+  const arr = [];
+  for (let i = 0; i < s.fives;  i++) arr.push(`<div class="plate plate-5" style="animation-delay:${i * 0.05}s">5</div>`);
+  for (let i = 0; i < s.halves; i++) arr.push(`<div class="plate plate-2" style="animation-delay:${(s.fives + i) * 0.05}s">2.5</div>`);
+  return (reverse ? arr.reverse() : arr).join('');
+}
+
+function visualHTML(left, right) {
+  const screws = '<div class="screw"></div>'.repeat(cfg().screws);
+  return `<div class="plate-visual">
+    ${plateDivs(left, true)}${screws}<div class="handle">HDL</div>${screws}${plateDivs(right, false)}
+  </div>`;
+}
+
+function renderQuickPicks() {
+  els.qp.innerHTML = QUICK_PICKS.map(w => {
+    const steps = Math.round(w / STEP_LB);          // safe: w is a constant multiple of 2.5
+    const ok = steps >= baseSteps();
+    const cls = steps === wtSteps ? 'qp-btn active' : ok ? 'qp-btn' : 'qp-btn unreachable';
+    return `<button class="${cls}" data-steps="${ok ? steps : ''}">${w}</button>`;
+  }).join('');
+}
+
+// ── build static controls once, wire events ──
+els.themes.innerHTML = THEMES.map((t, i) =>
+  `<button class="theme-btn${i === 0 ? ' active' : ''}" data-i="${i}">${t.label}</button>`).join('');
+els.themes.addEventListener('click', e => {
+  const b = e.target.closest('.theme-btn');
+  if (b) setTheme(+b.dataset.i);
+});
+
+els.configs.innerHTML = CONFIGS.map((c, i) =>
+  `<button class="config-btn${i === cfgIdx ? ' active' : ''}" data-i="${i}">${c.label}<span>${c.sub}</span></button>`).join('');
+els.configs.addEventListener('click', e => {
+  const b = e.target.closest('.config-btn');
+  if (b) setConfig(+b.dataset.i);
+});
+
+els.qp.addEventListener('click', e => {
+  const b = e.target.closest('.qp-btn');
+  if (b && b.dataset.steps !== '') { wtSteps = +b.dataset.steps; render(); }
+});
+
+$('btn-minus').addEventListener('click', () => adjustWeight(-1));
+$('btn-plus' ).addEventListener('click', () => adjustWeight(+1));
+
+render();
+</script>
+</body>
+</html>
