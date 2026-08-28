@@ -90,6 +90,15 @@
   --p5-1:#5a0000; --p5-2:#300000; --p5-bd:#8b0000; --p5-tx:#ffaaaa;
   --p2-1:#3a3040; --p2-2:#201828; --p2-bd:#6a5070; --p2-tx:#c8a0d0;
 }
+[data-theme="sakura"] {
+  --bg:#f9d5e0; --card:#f8f4e9; --border:#d9cfb8; --text:#4c5d3f;
+  --subtext:#7a8a68; --faint:#a8b598; --fainter:#d0d8c2; --input-bg:#f1ead9;
+  --accent:#4c5d3f; --hi:#4c5d3f; --groove:#f0bccf; --rowline:#ece4d2;
+  --grid:rgba(76,93,63,0.05); --shadow:rgba(120,80,95,0.18);
+  --metal1:#cfc4ae; --metal2:#b3a88f; --metal-bd:#b8ac92; --metal-tx:#6d6350;
+  --p5-1:#a3c293; --p5-2:#7fa36b; --p5-bd:#8fb07f; --p5-tx:#2e3a26;
+  --p2-1:#f4b8cd; --p2-2:#e79cb6; --p2-bd:#eeaac2; --p2-tx:#6b3247;
+}
 
 /* ════ BASE ════ */
 html { -webkit-text-size-adjust: 100%; }
@@ -183,6 +192,8 @@ header p {
   color: #8b0000;
   text-shadow: 0 0 10px rgba(139,0,0,0.5), 2px 2px 0 #000;
 }
+[data-theme="sakura"] header h1 { text-shadow: 3px 3px 0 #f0bccf; }
+[data-theme="sakura"] header h1 span { color: #7fa36b; }
 
 /* ════ THEME SWITCHER ════ */
 .theme-switcher {
@@ -230,6 +241,10 @@ header p {
 [data-theme="goth"] .card {
   box-shadow: 0 0 0 1px #8b000022, inset 0 0 40px rgba(60,0,40,0.4), 0 30px 80px rgba(0,0,0,0.98);
   background: linear-gradient(160deg, #170c1e 0%, #0e0612 100%);
+}
+[data-theme="sakura"] .card {
+  border-top: 3px solid #a3c293;
+  box-shadow: 0 20px 60px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.7);
 }
 
 .section-label {
@@ -464,6 +479,7 @@ const THEMES = [
   { id: 'laser',    label: '🌈 Laser', color: '#0d0020' },
   { id: 'batman',   label: '🦇 Bats',  color: '#0a0a0a' },
   { id: 'goth',     label: '🖤 Goth',  color: '#0c080f' },
+  { id: 'sakura',   label: '🌸 Sakura', color: '#f9d5e0' },
 ];
 
 // ── state ──
